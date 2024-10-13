@@ -15,6 +15,20 @@ abstract public class BValue implements Iterable<BValue> {
 	
 	abstract public BType getType();
 	
+	// other is guaranteed to be same BType
+	abstract public boolean compare(BValue other);
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof BValue)) return false;
+		
+		BValue other = (BValue)o;
+		if (other.getType() != getType()) return false;
+		
+		return compare(other);
+	}
+	
 	public BValue getNext() {
 		return next;
 	}
