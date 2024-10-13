@@ -20,4 +20,9 @@ public class BInteger extends BValue {
 	public long get() {
 		return value;
 	}
+	
+	@Override
+	public String toString() {
+		return Long.toString(value);
+	}
 }

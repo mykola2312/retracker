@@ -64,4 +64,18 @@ public class BList extends BValue {
 		
 		return it.next();
 	}
+	
+	public BValue find(BValue key) {
+		if (getLength() == 0) {
+			return null;
+		}
+		
+		for (BValue node : this) {
+			if (node.equals(key)) {
+				return node;
+			}
+		}
+		
+		return null;
+	}
 }

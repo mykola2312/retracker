@@ -1,6 +1,7 @@
 package com.mykola2312.retracker.bencode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -51,5 +52,16 @@ public class BListTest {
 		assertEquals(new BInteger(3), list.get(2));
 		
 		assertThrows(IndexOutOfBoundsException.class, () -> list.get(3));
+	}
+	
+	@Test
+	public void testFind() {
+		BList list = new BList();
+		list.append(new BInteger(1));
+		list.append(new BInteger(2));
+		
+		assertNotNull(list.find(new BInteger(1)));
+		assertNotNull(list.find(new BInteger(2)));
+		assertNull(list.find(new BInteger(3)));
 	}
 }
