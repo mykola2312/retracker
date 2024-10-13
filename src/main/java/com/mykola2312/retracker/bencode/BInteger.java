@@ -8,6 +8,11 @@ public class BInteger extends BValue {
 	}
 	
 	@Override()
+	public boolean compare(BValue other) {
+		return get() == ((BInteger)other).get();
+	}
+	
+	@Override()
 	public BType getType() {
 		return BType.INTEGER;
 	}

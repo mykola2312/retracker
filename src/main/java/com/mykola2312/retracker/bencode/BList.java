@@ -11,6 +11,11 @@ public class BList extends BValue {
 		return BType.LIST;
 	}
 	
+	@Override()
+	public boolean compare(BValue other) {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+	
 	protected BValue getFirst() {
 		return getChild();
 	}
@@ -30,11 +35,11 @@ public class BList extends BValue {
 	// builder
 	public BList append(BValue item) {
 		BValue first = getFirst();
+		BValue last = getLast();
 		if (first == null) {
 			setFirst(item);
 			setLast(item);
 		} else {
-			BValue last = getLast();
 			last.setNext(item);
 			setLast(item);
 		}
@@ -53,7 +58,7 @@ public class BList extends BValue {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		while (--index > 0) {
+		while (index-- > 0) {
 			it.next();
 		}
 		
