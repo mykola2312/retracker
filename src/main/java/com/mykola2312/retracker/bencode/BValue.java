@@ -10,24 +10,25 @@ import java.util.Iterator;
  */
 
 abstract public class BValue implements Iterable<BValue> {
-	private BType type;
 	private BValue next = null;
 	private BValue child = null;
 	
-	protected BValue(BType type) {
-		this.type = type;
-	}
-	
-	public BType getType() {
-		return type;
-	}
+	abstract public BType getType();
 	
 	public BValue getNext() {
 		return next;
 	}
 	
+	public void setNext(BValue next) {
+		this.next = next;
+	}
+	
 	public BValue getChild() {
 		return child;
+	}
+	
+	public void setChild(BValue child) {
+		this.child = child;
 	}
 	
 	public Iterator<BValue> iterator() {
