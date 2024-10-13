@@ -9,11 +9,12 @@ public class BValueIterator implements Iterator<BValue> {
 	}
 	
 	public boolean hasNext() {
-		return node != null && node.getNext() != null;
+		return node != null;
 	}
 	
 	public BValue next() {
-		node = node.getNext();
-		return node;
+		BValue current = node;
+		node = current.getNext();
+		return current;
 	}
 }
