@@ -10,6 +10,10 @@ public class BString extends BValue {
 		this.bytes = bytes;
 	}
 	
+	public BString(String text) {
+		this.bytes = text.getBytes(StandardCharsets.UTF_8);
+	}
+	
 	@Override()
 	public boolean compare(BValue other) {
 		return Arrays.equals(((BString)other).get(), get());
