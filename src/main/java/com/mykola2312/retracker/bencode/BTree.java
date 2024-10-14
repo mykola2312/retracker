@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import com.mykola2312.retracker.bencode.error.BDecodeError;
+import com.mykola2312.retracker.bencode.error.BDecodeMalformed;
 import com.mykola2312.retracker.bencode.error.BDecodeParseError;
-import com.mykola2312.retracker.bencode.error.BDecodeUnknown;
 
 public class BTree {
 	private BValue root = null;
@@ -40,21 +40,30 @@ public class BTree {
 		
 		public BValue decode() throws BDecodeError {
 			BType type;
+			if (data.length < 2) {
+				/* no bencode data can be less than 2 bytes: for integer must be 'i0e' atleast,
+				 * strings must be at least '0:' and lists and dicts can be empty
+				 */
+				throw new BDecodeMalformed(data, offset, "data is shorter than 2 bytes");
+			}
 			
 			// consume and determine type
 			switch (data[offset]) {
 			case BE_INTEGER: type = BType.INTEGER; break;
 			case BE_LIST: type = BType.LIST; break;
 			case BE_DICT: type = BType.DICT; break;
-			default: throw new BDecodeUnknown(data, offset, data[offset]);
+			default: type = BType.STRING;
 			}
 			offset++;
 			
 			if (type.equals(BType.INTEGER)) {
 				// advance until we hit end marker
 				int end = offset;
-				while (data[end] != BDecoder.BE_END) {
+				while (end < data.length && data[end] != BDecoder.BE_END) {
 					end++;
+				}
+				if (end == data.length) {
+					throw new BDecodeMalformed(data, offset, "no integer terminator");
 				}
 				// convert bytes to string and string to integer
 				byte[] bytes = Arrays.copyOfRange(data, offset, end);
