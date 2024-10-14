@@ -1,5 +1,6 @@
 package com.mykola2312.retracker.bencode;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -8,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
+
+import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 
 public class BListTest {
 	@Test
@@ -63,5 +66,28 @@ public class BListTest {
 		assertNotNull(list.find(new BInteger(1)));
 		assertNotNull(list.find(new BInteger(2)));
 		assertNull(list.find(new BInteger(3)));
+	}
+	
+	@Test
+	public void testGet() throws IndexOutOfBoundsException, BErrorValueCast {
+		BList list = new BList();
+		list.append(new BInteger(1));
+		
+		assertDoesNotThrow(() -> {
+			BInteger value = list.get(BType.INTEGER, 0);
+			
+			assertNotNull(value);
+			assertEquals(value, new BInteger(1));
+		});
+	}
+	
+	@Test
+	public void testGetWrongCast() throws IndexOutOfBoundsException, BErrorValueCast {
+		BList list = new BList();
+		list.append(new BInteger(1));
+		
+		assertThrows(BErrorValueCast.class, () -> {
+			BString wrong = list.get(BType.STRING, 0);
+		});
 	}
 }
