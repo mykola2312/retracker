@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import com.mykola2312.retracker.bencode.error.BErrorKeyNotFound;
+import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 import com.mykola2312.retracker.bencode.error.BValueError;
 
 public class BDictTest {
@@ -29,7 +30,9 @@ public class BDictTest {
 	public void testKeyNotFound() {
 		BDict empty = new BDict();
 		
-		assertThrows(BErrorKeyNotFound.class, () -> { empty.get(new BString("non-existent")); });
+		assertThrows(BErrorKeyNotFound.class, () -> {
+			empty.get(new BString("non-existent"));
+		});
 	}
 	
 	@Test
@@ -41,5 +44,15 @@ public class BDictTest {
 		assertNotNull(node);
 		assertNotNull(node.getChild());
 		assertEquals(node.getChild(), new BInteger(2));
+	}
+	
+	@Test
+	public void testCastError() {
+		BDict dict = new BDict();
+		dict.set("key", new BInteger(4));
+		
+		assertThrows(BErrorValueCast.class, () -> {
+			dict.<BString>get("key").get();
+		});
 	}
 }
