@@ -2,6 +2,8 @@ package com.mykola2312.retracker.bencode;
 
 import java.util.Iterator;
 
+import com.mykola2312.retracker.bencode.error.BErrorValueCast;
+
 public class BList extends BValue {
 	private BValue last = null;
 	private int length = 0;
@@ -63,6 +65,16 @@ public class BList extends BValue {
 		}
 		
 		return it.next();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BValue> T get(BType type, int index) throws IndexOutOfBoundsException, BErrorValueCast {
+		BValue value = get(index);
+		if (!value.getType().equals(type)) {
+			throw new BErrorValueCast(this, Integer.toString(index), type, value.getType());
+		}
+		
+		return (T)value;
 	}
 	
 	public BValue find(BValue key) {
