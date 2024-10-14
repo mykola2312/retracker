@@ -41,13 +41,12 @@ public class BDict extends BList {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends BValue> T get(String key) throws BValueError {
-		T value = (T)get(new BString(key));
-		System.out.println("sedsed " + value.getClass().getName());
-		if (!(value instanceof T)) {
-			throw new BErrorValueCast(this, key, value.getClass());
+	public <T extends BValue> T get(BType type, String key) throws BValueError {
+		BValue value = get(new BString(key));
+		if (!value.getType().equals(type)) {
+			throw new BErrorValueCast(this, key, type, value.getType());
 		}
 		
-		return value;
+		return (T)value;
 	}
 }

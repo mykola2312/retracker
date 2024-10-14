@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +53,23 @@ public class BDictTest {
 		dict.set("key", new BInteger(4));
 		
 		assertThrows(BErrorValueCast.class, () -> {
-			dict.<BString>get("key").get();
+			dict.<BString>get(BType.STRING, "key");
+		});
+	}
+	
+	@Test
+	public void testGetChained() {
+		BDict dict = new BDict()
+			.set("first", new BDict()
+					.set("second", new BInteger(3)));
+		
+		assertDoesNotThrow(() -> {
+			BInteger value = dict
+					.<BDict>get(BType.DICT, "first")
+					.<BInteger>get(BType.INTEGER, "second");
+			
+			assertNotNull(value);
+			assertEquals(value, new BInteger(3));
 		});
 	}
 }
