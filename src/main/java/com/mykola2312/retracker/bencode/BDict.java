@@ -2,6 +2,7 @@ package com.mykola2312.retracker.bencode;
 
 import com.mykola2312.retracker.bencode.error.BErrorKeyNotFound;
 import com.mykola2312.retracker.bencode.error.BErrorNoChildren;
+import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 import com.mykola2312.retracker.bencode.error.BValueError;
 
 public class BDict extends BList {
@@ -34,7 +35,18 @@ public class BDict extends BList {
 		if (node == null) throw new BErrorKeyNotFound(this, key);
 		
 		BValue value = node.getChild();
-		if (value == node) throw new BErrorNoChildren(node);
+		if (value == null) throw new BErrorNoChildren(node);
+		
+		return value;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BValue> T get(String key) throws BValueError {
+		T value = (T)get(new BString(key));
+		System.out.println("sedsed " + value.getClass().getName());
+		if (!(value instanceof T)) {
+			throw new BErrorValueCast(this, key, value.getClass());
+		}
 		
 		return value;
 	}
