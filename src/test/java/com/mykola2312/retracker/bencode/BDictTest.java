@@ -20,11 +20,11 @@ public class BDictTest {
 		dict.set(new BString("first"), new BInteger(1));
 		assertNotNull(dict.find(new BString("first")));
 		assertNull(dict.find(new BString("second")));
-		assertEquals(dict.get(new BString("first")), new BInteger(1));
+		assertEquals(new BInteger(1), dict.get(new BString("first")));
 		System.out.println(dict.get(new BString("first")).toString());
 		
 		dict.set(new BString("second"), new BInteger(2));
-		assertEquals(dict.get(new BString("second")), new BInteger(2));
+		assertEquals(new BInteger(2), dict.get(new BString("second")));
 	}
 	
 	@Test
@@ -44,7 +44,7 @@ public class BDictTest {
 		BValue node = dict.find(new BInteger(1));
 		assertNotNull(node);
 		assertNotNull(node.getChild());
-		assertEquals(node.getChild(), new BInteger(2));
+		assertEquals(new BInteger(2), node.getChild());
 	}
 	
 	@Test
@@ -69,7 +69,7 @@ public class BDictTest {
 					.<BInteger>get(BType.INTEGER, "second");
 			
 			assertNotNull(value);
-			assertEquals(value, new BInteger(3));
+			assertEquals(new BInteger(3), value);
 		});
 	}
 }

@@ -17,7 +17,7 @@ public class BListTest {
 	public void testEmptyList() {
 		BList empty = new BList();
 		
-		assertEquals(0, empty.getLength());
+		assertEquals(empty.getLength(), 0);
 		assertNull(empty.getChild());
 	}
 	
@@ -50,9 +50,9 @@ public class BListTest {
 			System.out.println(((BInteger)list.get(2)).get());
 		}
 		
-		assertEquals(new BInteger(1), list.get(0));
-		assertEquals(new BInteger(2), list.get(1));
-		assertEquals(new BInteger(3), list.get(2));
+		assertEquals(list.get(0), new BInteger(1));
+		assertEquals(list.get(1), new BInteger(2));
+		assertEquals(list.get(2), new BInteger(3));
 		
 		assertThrows(IndexOutOfBoundsException.class, () -> list.get(3));
 	}
@@ -77,7 +77,7 @@ public class BListTest {
 			BInteger value = list.get(BType.INTEGER, 0);
 			
 			assertNotNull(value);
-			assertEquals(value, new BInteger(1));
+			assertEquals(new BInteger(1), value);
 		});
 	}
 	
