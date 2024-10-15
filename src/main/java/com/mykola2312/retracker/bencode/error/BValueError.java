@@ -2,7 +2,7 @@ package com.mykola2312.retracker.bencode.error;
 
 import com.mykola2312.retracker.bencode.BValue;
 
-public class BValueError extends Exception {
+public class BValueError extends BError {
 	private static final long serialVersionUID = 6950892783320917930L;
 
 	public BValue node;
