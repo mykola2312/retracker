@@ -36,6 +36,12 @@ public class BList extends BValue {
 	
 	// builder
 	public BList append(BValue item) {
+		// do not allow any nulls pass into list, because it fucks up everything
+		if (item == null) {
+			// fail earlier than fail horribly
+			throw new NullPointerException();
+		}
+		
 		BValue first = getFirst();
 		BValue last = getLast();
 		if (first == null) {
