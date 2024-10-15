@@ -21,7 +21,7 @@ public class BTreeTest {
 			
 			BValue root = tree.getRoot();
 			assertNotNull(root);
-			assertEquals(root, new BInteger(696969));
+			assertEquals(new BInteger(696969), root);
 			
 			System.out.println("testParseInt: " + root.toString());
 		});
@@ -47,7 +47,7 @@ public class BTreeTest {
 			
 			BValue root = tree.getRoot();
 			assertNotNull(root);
-			assertEquals(((BList)root).getLength(), 0);
+			assertEquals(0, ((BList)root).getLength());
 		});
 	}
 	
@@ -70,16 +70,50 @@ public class BTreeTest {
 				}
 			}
 			assertDoesNotThrow(() -> {
-				assertEquals(list.get(BType.INTEGER, 0), new BInteger(1));
-				assertEquals(list.get(BType.INTEGER, 1), new BInteger(2345678));
+				assertEquals(new BInteger(1), list.get(BType.INTEGER, 0));
+				assertEquals(new BInteger(2345678), list.get(BType.INTEGER, 1));
 				
 				BInteger value = list
 						.<BList>get(BType.LIST, 2)
 						.<BInteger>get(BType.INTEGER, 0);
 				assertNotNull(value);
-				assertEquals(value, new BInteger(69));
+				assertEquals(new BInteger(69), value);
 				System.out.println("value from nested list: " + value);
 			});
+		});
+	}
+	
+	@Test
+	public void testString() throws BDecodeError {
+		final byte[] data = "11:testString!".getBytes();
+		
+		BTree tree = new BTree();
+		assertDoesNotThrow(() -> {
+			tree.decode(data);
+			
+			assertNotNull(tree.getRoot());
+			
+			BString string = (BString)tree.getRoot();
+			System.out.println("string: " + string);
+			assertEquals(new BString("testString!"), string);
+		});
+	}
+	
+	@Test
+	public void testDict() throws BDecodeError {
+		final byte[] data = "di0e5:first6:secondi69ee".getBytes();
+		
+		BTree tree = new BTree();
+		assertDoesNotThrow(() -> {
+			tree.decode(data);
+			
+			BDict root = tree.asDict();
+			// check keys
+			assertEquals(new BInteger(0), root.find(new BInteger(0)));
+			assertEquals(new BString("second"), root.find(new BString("second")));
+			// check values
+			assertEquals(new BString("first"), root.get(new BInteger(0)));
+			assertEquals(new BInteger(69), root.<BInteger>get(BType.INTEGER, "second"));
 		});
 	}
 }
