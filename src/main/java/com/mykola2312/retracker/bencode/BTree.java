@@ -98,6 +98,8 @@ public class BTree {
 				// advance past terminator
 				offset++;
 				return dict;
+			} else if (type == BDecoder.BE_END) {
+				throw new BDecodeMalformed(data, offset, "encountered terminator where it shouldn't be");
 			} else { // string
 				// since string does not have leading type byte, move back offset
 				offset--;
