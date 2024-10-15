@@ -5,10 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 import com.mykola2312.retracker.bencode.error.BDecodeError;
 import com.mykola2312.retracker.bencode.error.BDecodeMalformed;
+import com.mykola2312.retracker.bencode.error.BError;
 
 public class BTreeTest {
 	@Test
@@ -114,6 +119,48 @@ public class BTreeTest {
 			// check values
 			assertEquals(new BString("first"), root.get(new BInteger(0)));
 			assertEquals(new BInteger(69), root.<BInteger>get(BType.INTEGER, "second"));
+		});
+	}
+	
+	@Test
+	public void testNestedDict() throws BError {
+		final byte[] data = "d5:firstd6:secondd5:thirdi1337eeee".getBytes();
+		
+		BTree tree = new BTree();
+		assertDoesNotThrow(() -> {
+			tree.decode(data);
+			
+			BInteger value = tree
+					.asDict()
+					.<BDict>get(BType.DICT, "first")
+					.<BDict>get(BType.DICT, "second")
+					.<BInteger>get(BType.INTEGER, "third");
+			assertNotNull(value);
+			assertEquals(new BInteger(1337), value);
+		});
+	}
+	
+	@Test
+	public void testTorrentFile() throws BError, IOException {
+		final byte[] data = Files.readAllBytes(Path.of("test", "test.torrent"));
+		
+		BTree torrent = new BTree();
+		assertDoesNotThrow(() -> {
+			torrent.decode(data);
+			
+			BDict root = torrent.asDict();
+			assertEquals(new BString("http://example.com/announce"), root.<BString>get(BType.STRING, "announce"));
+			assertEquals(new BString("Test Comment"), root.<BString>get(BType.STRING, "comment"));
+			assertEquals(new BString("qBittorrent v4.6.5"), root.<BString>get(BType.STRING, "created by"));
+			assertEquals(new BInteger(1729033917), root.<BString>get(BType.INTEGER, "creation date"));
+			
+			BInteger pieceLength = root
+					.<BDict>get(BType.DICT, "info")
+					.<BDict>get(BType.DICT, "file tree")
+					.<BDict>get(BType.DICT, "random-data.bin")
+					.<BDict>get(BType.DICT, "")
+					.<BInteger>get(BType.INTEGER, "length");
+			assertEquals(new BInteger(16777216), pieceLength);
 		});
 	}
 }
