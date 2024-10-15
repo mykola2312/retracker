@@ -1,6 +1,6 @@
 package com.mykola2312.retracker.bencode.error;
 
-public class BDecodeError extends Exception {
+public class BDecodeError extends BError {
 	private static final long serialVersionUID = 4282658520481186036L;
 	
 	public byte[] data;
