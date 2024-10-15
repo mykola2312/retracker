@@ -6,7 +6,8 @@ import java.util.Arrays;
 import com.mykola2312.retracker.bencode.error.BDecodeError;
 import com.mykola2312.retracker.bencode.error.BDecodeMalformed;
 import com.mykola2312.retracker.bencode.error.BDecodeParseError;
-import com.mykola2312.retracker.bencode.error.BDecodeUnknown;
+import com.mykola2312.retracker.bencode.error.BErrorNoRoot;
+import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 
 public class BTree {
 	private BValue root = null;
@@ -24,12 +25,23 @@ public class BTree {
 			this.offset = offset;
 		}
 		
-		private Long parseLong(byte[] bytes) throws BDecodeParseError {
+		// used to parse string lengths
+		private int parseInt(byte[] bytes) throws BDecodeParseError {
+			String strInt = new String(bytes, StandardCharsets.UTF_8);
+			try {
+				return Integer.parseInt(strInt);
+			} catch (NumberFormatException e) {
+				throw new BDecodeParseError(data, offset, e, strInt);
+			}
+		}
+		
+		// used for BInteger
+		private long parseLong(byte[] bytes) throws BDecodeParseError {
 			String strInt = new String(bytes, StandardCharsets.UTF_8);
 			try {
 				return Long.parseLong(strInt);
 			} catch (NumberFormatException e) {
-				throw new BDecodeParseError(data, offset, e);
+				throw new BDecodeParseError(data, offset, e, strInt);
 			}
 		}
 		
@@ -75,13 +87,55 @@ public class BTree {
 				// advance past terminator
 				offset++;
 				return list;
+			} else if (type == BDecoder.BE_DICT) {
+				BDict dict = new BDict();
+				// same business as BList, but we read pairs of values, key and value
+				while (offset < data.length && data[offset] != BDecoder.BE_END) {
+					BValue key = decode();
+					BValue value = decode();
+					dict.set(key, value);
+				}
+				// advance past terminator
+				offset++;
+				return dict;
+			} else { // string
+				// since string does not have leading type byte, move back offset
+				offset--;
+				// find string separator
+				int sep = offset;
+				while (sep < data.length && data[sep] != BDecoder.BE_STRING_SEP) {
+					sep++;
+				}
+				if (sep == data.length) {
+					throw new BDecodeMalformed(data, offset, "no string separator");
+				}
+				// everything before sep is integer of string length
+				int length = parseInt(Arrays.copyOfRange(data, offset, sep));
+				if (offset + length >= data.length) {
+					throw new BDecodeMalformed(data, offset, "string length is bigger than data");
+				}
+				
+				BString string = new BString(Arrays.copyOfRange(data, sep + 1, sep + 1 + length));
+				offset = sep + 1 + length;
+				
+				return string;
 			}
-			
-			throw new BDecodeUnknown(data, offset, type);
 		}
 	}
 	
 	public void decode(byte[] data) throws BDecodeError {
 		this.root = new BDecoder(data, 0).decode();
+	}
+	
+	public BDict asDict() throws BErrorNoRoot, BErrorValueCast {
+		if (root == null) {
+			throw new BErrorNoRoot();
+		}
+		
+		if (!root.getType().equals(BType.DICT)) {
+			throw new BErrorValueCast(root, "", BType.DICT, root.getType());
+		}
+		
+		return (BDict)root;
 	}
 }
