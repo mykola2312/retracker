@@ -6,7 +6,7 @@ public class BDecodeUnknown extends BDecodeError {
 	byte unknown;
 	
 	public BDecodeUnknown(byte[] data, int offset, byte unknown) {
-		super(data, offset, String.format("Unknown symbol 0x%x at offset %d", unknown));
+		super(data, offset, String.format("Unknown symbol 0x%x at offset %d", unknown, offset));
 		this.unknown = unknown;
 	}
 }
