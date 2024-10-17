@@ -164,6 +164,10 @@ public class BTreeTest {
 			
 			tree.setRoot(new BString("test"));
 			assertArrayEquals("4:test".getBytes(), tree.encode());
+			
+			tree.setRoot(new BDict())
+				.set(new BInteger(1), new BInteger(2));
+			assertArrayEquals("di1ei2ee".getBytes(), tree.encode());
 		});
 	}
 	
@@ -188,6 +192,18 @@ public class BTreeTest {
 					.<BDict>get(BType.DICT, "")
 					.<BInteger>get(BType.INTEGER, "length");
 			assertEquals(new BInteger(16777216), pieceLength);
+		});
+	}
+	
+	@Test
+	public void testDecodeEncodeTorrentFile() throws BError, IOException {
+		final byte[] data = Files.readAllBytes(Path.of("test", "test.torrent"));
+		
+		BTree torrent = new BTree();
+		assertDoesNotThrow(() -> {
+			torrent.decode(data);
+			
+			assertArrayEquals(data, torrent.encode());
 		});
 	}
 }
