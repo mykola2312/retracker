@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import com.mykola2312.retracker.bencode.error.BDecodeError;
 import com.mykola2312.retracker.bencode.error.BDecodeMalformed;
 import com.mykola2312.retracker.bencode.error.BError;
+import com.mykola2312.retracker.bencode.error.BErrorInvalidKey;
 
 public class BTreeTest {
 	@Test
@@ -142,12 +144,26 @@ public class BTreeTest {
 	}
 	
 	@Test
+	public void testInvalidKeys() {
+		assertThrows(BErrorInvalidKey.class, () -> {
+			new BTree().setRoot(new BDict()).set(new BList(), new BList());
+		});
+		
+		assertThrows(BDecodeMalformed.class, () -> {
+			new BTree().decode("dlelee".getBytes());
+		});
+	}
+	
+	@Test
 	public void testEncode() {
 		assertDoesNotThrow(() -> {
 			BTree tree = new BTree();
 			
 			tree.setRoot(new BInteger(1));
 			assertArrayEquals("i1e".getBytes(), tree.encode());
+			
+			tree.setRoot(new BString("test"));
+			assertArrayEquals("4:test".getBytes(), tree.encode());
 		});
 	}
 	

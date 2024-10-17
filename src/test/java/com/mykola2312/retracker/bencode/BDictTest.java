@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
+import com.mykola2312.retracker.bencode.error.BErrorInvalidKey;
 import com.mykola2312.retracker.bencode.error.BErrorKeyNotFound;
 import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 import com.mykola2312.retracker.bencode.error.BValueError;
@@ -37,7 +38,7 @@ public class BDictTest {
 	}
 	
 	@Test
-	public void testKeyChild() {
+	public void testKeyChild() throws BErrorInvalidKey {
 		BDict dict = new BDict();
 		dict.set(new BInteger(1), new BInteger(2));
 		
