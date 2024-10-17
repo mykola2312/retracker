@@ -1,12 +1,14 @@
 package com.mykola2312.retracker.bencode;
 
 import static io.netty.buffer.Unpooled.buffer;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import com.mykola2312.retracker.bencode.error.BDecodeError;
 import com.mykola2312.retracker.bencode.error.BDecodeMalformed;
 import com.mykola2312.retracker.bencode.error.BDecodeParseError;
+import com.mykola2312.retracker.bencode.error.BErrorInvalidKey;
 import com.mykola2312.retracker.bencode.error.BErrorNoRoot;
 import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 
@@ -102,7 +104,11 @@ public class BTree {
 				while (offset < data.length && data[offset] != BTree.BE_END) {
 					BValue key = decode();
 					BValue value = decode();
-					dict.set(key, value);
+					try {
+						dict.set(key, value);
+					} catch (BErrorInvalidKey e) {
+						throw new BDecodeMalformed(data, offset, e.getMessage());
+					}
 				}
 				// advance past terminator
 				offset++;
@@ -171,6 +177,7 @@ public class BTree {
 			case LIST:
 				buffer.writeByte(BE_LIST);
 				for (BValue item : node) {
+					System.err.println("encoding list item: " + item);
 					encode(item);
 				}
 				buffer.writeByte(BE_END);

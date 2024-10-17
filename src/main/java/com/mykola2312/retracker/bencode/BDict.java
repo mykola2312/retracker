@@ -1,5 +1,6 @@
 package com.mykola2312.retracker.bencode;
 
+import com.mykola2312.retracker.bencode.error.BErrorInvalidKey;
 import com.mykola2312.retracker.bencode.error.BErrorKeyNotFound;
 import com.mykola2312.retracker.bencode.error.BErrorNoChildren;
 import com.mykola2312.retracker.bencode.error.BErrorValueCast;
@@ -11,7 +12,20 @@ public class BDict extends BList {
 		return BType.DICT;
 	}
 	
-	public BDict set(BValue key, BValue value) {
+	public BDict set(BValue key, BValue value) throws BErrorInvalidKey {
+		if (key == null || value == null) {
+			throw new BErrorInvalidKey(this, key, "key or value is null");
+		}
+		/* key type cannot have child, because it messes up tree,
+		 * in other words, key cannot be a list or dict
+		 */
+		if (key.getChild() != null) {
+			throw new BErrorInvalidKey(this, key, "key has child, because its list or a dict");
+		}
+		if (key.getType().equals(BType.LIST) || key.getType().equals(BType.DICT)) {
+			throw new BErrorInvalidKey(this, key, "key shall not be list or a dict");
+		}
+		
 		BValue node = find(key);
 		if (node != null) {
 			node.setNext(value);
@@ -24,7 +38,14 @@ public class BDict extends BList {
 	}
 	
 	public BDict set(String key, BValue value) {
-		return set(new BString(key), value);
+		/* we "suppress" here exceptions since this method is used
+		 * for building BTrees, not when decoding
+		 */
+		try {
+			return set(new BString(key), value);
+		} catch (BErrorInvalidKey e) {
+			throw new RuntimeException("this shouldn't have happened in BDict set: " + e.getMessage());
+		}
 	}
 	
 	/* since we're going to employ builder pattern, we can't return null.
