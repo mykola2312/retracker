@@ -1,0 +1,14 @@
+The purpose of retracker is to be tracker and an announce proxy at the same time.
+
+retracker shall expose it's internal tracker cache as standalone tracker,
+implementing HTTP and UDP announces. Available for non-proxied peers, serving as regular tracker.
+
+Then, server another HTTP and UDP endpoints as announce proxy. Local peer requesting announce
+to proxied tracker shall be matched by announce URL and tracker key (if there is), or another identifier
+like peer_id. Proxy endpoint is available only for requests that match forementioned tracker key.
+When request is made to proxy endpoint and it matches key - re-announce to destination trackers should be made and
+on successful peer list retrieval - local tracker cache updated. If not, peers from cache should be returned.
+
+On re-announce to destination trackers, proxied peer's real IP must be injected into announce request and
+other parameters should remain same as in original request.
+
