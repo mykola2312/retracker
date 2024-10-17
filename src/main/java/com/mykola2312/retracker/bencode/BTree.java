@@ -1,5 +1,6 @@
 package com.mykola2312.retracker.bencode;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -15,6 +16,12 @@ public class BTree {
 	public BValue getRoot() {
 		return root;
 	}
+	
+	private static final byte BE_INTEGER = (byte)'i';
+	private static final byte BE_LIST = (byte)'l';
+	private static final byte BE_DICT = (byte)'d';
+	private static final byte BE_STRING_SEP = (byte)':';
+	private static final byte BE_END = (byte)'e';
 	
 	class BDecoder {
 		private byte[] data;
@@ -45,12 +52,6 @@ public class BTree {
 			}
 		}
 		
-		private static final byte BE_INTEGER = (byte)'i';
-		private static final byte BE_LIST = (byte)'l';
-		private static final byte BE_DICT = (byte)'d';
-		private static final byte BE_STRING_SEP = (byte)':';
-		private static final byte BE_END = (byte)'e';
-		
 		public BValue decode() throws BDecodeError {
 			if (data.length - offset < 2) {
 				/* no bencode data can be less than 2 bytes: for integer must be 'i0e' atleast,
@@ -62,10 +63,10 @@ public class BTree {
 			// consume and determine type
 			byte type = data[offset++];
 			
-			if (type == BDecoder.BE_INTEGER) {
+			if (type == BTree.BE_INTEGER) {
 				// advance until we hit end marker
 				int end = offset;
-				while (end < data.length && data[end] != BDecoder.BE_END) {
+				while (end < data.length && data[end] != BTree.BE_END) {
 					end++;
 				}
 				if (end == data.length) {
@@ -77,20 +78,20 @@ public class BTree {
 				offset = end + 1;
 				
 				return new BInteger(parseLong(bytes));
-			} else if (type == BDecoder.BE_LIST) {
+			} else if (type == BTree.BE_LIST) {
 				BList list = new BList();
 				// we're going to use recursion to read elements until we hit end
-				while (offset < data.length && data[offset] != BDecoder.BE_END) {
+				while (offset < data.length && data[offset] != BTree.BE_END) {
 					BValue item = decode();
 					list.append(item);
 				}
 				// advance past terminator
 				offset++;
 				return list;
-			} else if (type == BDecoder.BE_DICT) {
+			} else if (type == BTree.BE_DICT) {
 				BDict dict = new BDict();
 				// same business as BList, but we read pairs of values, key and value
-				while (offset < data.length && data[offset] != BDecoder.BE_END) {
+				while (offset < data.length && data[offset] != BTree.BE_END) {
 					BValue key = decode();
 					BValue value = decode();
 					dict.set(key, value);
@@ -98,14 +99,14 @@ public class BTree {
 				// advance past terminator
 				offset++;
 				return dict;
-			} else if (type == BDecoder.BE_END) {
+			} else if (type == BTree.BE_END) {
 				throw new BDecodeMalformed(data, offset, "encountered terminator where it shouldn't be");
 			} else { // string
 				// since string does not have leading type byte, move back offset
 				offset--;
 				// find string separator
 				int sep = offset;
-				while (sep < data.length && data[sep] != BDecoder.BE_STRING_SEP) {
+				while (sep < data.length && data[sep] != BTree.BE_STRING_SEP) {
 					sep++;
 				}
 				if (sep == data.length) {
@@ -139,5 +140,66 @@ public class BTree {
 		}
 		
 		return (BDict)root;
+	}
+	
+	class BEncoder {
+		private ByteBuffer buffer = ByteBuffer.allocate(0);
+		
+		private byte[] encodeInt(int value) {
+			return Integer.toString(value).getBytes(StandardCharsets.UTF_8);
+		}
+		
+		private byte[] encodeLong(long value) {
+			return Long.toString(value).getBytes(StandardCharsets.UTF_8);
+		}
+		
+		public void encode(BValue node) {
+			switch (node.getType()) {
+			case INTEGER:
+				buffer.put(BE_INTEGER);
+				buffer.put(encodeLong(((BInteger)node).get()));
+				buffer.put(BE_END);
+				break;
+			case LIST:
+				buffer.put(BE_LIST);
+				for (BValue item : node) {
+					encode(item);
+				}
+				buffer.put(BE_END);
+				break;
+			case DICT:
+				buffer.put(BE_DICT);
+				for (BValue key : node) {
+					encode(key);
+					encode(key.getChild());
+				}
+				buffer.put(BE_END);
+				break;
+			case STRING:
+				byte[] bytes = ((BString)node).get();
+				buffer.put(encodeInt(bytes.length));
+				buffer.put(BE_STRING_SEP);
+				buffer.put(bytes);
+				break;
+			}
+		}
+		
+		public byte[] get() {
+			int length = buffer.position();
+			byte[] out = new byte[length];
+			
+			buffer.get(out, 0, length);
+			return out;
+		}
+	}
+	
+	public byte[] encode() throws BErrorNoRoot {
+		BEncoder encoder = new BEncoder();
+		if (getRoot() == null) {
+			throw new BErrorNoRoot();
+		}
+		
+		encoder.encode(getRoot());
+		return encoder.get();
 	}
 }
