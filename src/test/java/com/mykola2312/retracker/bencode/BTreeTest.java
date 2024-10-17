@@ -1,5 +1,6 @@
 package com.mykola2312.retracker.bencode;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -137,6 +138,16 @@ public class BTreeTest {
 					.<BInteger>get(BType.INTEGER, "third");
 			assertNotNull(value);
 			assertEquals(new BInteger(1337), value);
+		});
+	}
+	
+	@Test
+	public void testEncode() {
+		assertDoesNotThrow(() -> {
+			BTree tree = new BTree();
+			
+			tree.setRoot(new BInteger(1));
+			assertArrayEquals("i1e".getBytes(), tree.encode());
 		});
 	}
 	

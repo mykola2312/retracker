@@ -1,6 +1,6 @@
 package com.mykola2312.retracker.bencode;
 
-import java.nio.ByteBuffer;
+import static io.netty.buffer.Unpooled.buffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -10,11 +10,19 @@ import com.mykola2312.retracker.bencode.error.BDecodeParseError;
 import com.mykola2312.retracker.bencode.error.BErrorNoRoot;
 import com.mykola2312.retracker.bencode.error.BErrorValueCast;
 
+import io.netty.buffer.ByteBuf;
+
 public class BTree {
 	private BValue root = null;
 	
 	public BValue getRoot() {
 		return root;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BValue> T setRoot(T root) {
+		this.root = root;
+		return (T)this.root;
 	}
 	
 	private static final byte BE_INTEGER = (byte)'i';
@@ -143,7 +151,7 @@ public class BTree {
 	}
 	
 	class BEncoder {
-		private ByteBuffer buffer = ByteBuffer.allocate(0);
+		private ByteBuf buffer = buffer();
 		
 		private byte[] encodeInt(int value) {
 			return Integer.toString(value).getBytes(StandardCharsets.UTF_8);
@@ -156,39 +164,39 @@ public class BTree {
 		public void encode(BValue node) {
 			switch (node.getType()) {
 			case INTEGER:
-				buffer.put(BE_INTEGER);
-				buffer.put(encodeLong(((BInteger)node).get()));
-				buffer.put(BE_END);
+				buffer.writeByte(BE_INTEGER);
+				buffer.writeBytes(encodeLong(((BInteger)node).get()));
+				buffer.writeByte(BE_END);
 				break;
 			case LIST:
-				buffer.put(BE_LIST);
+				buffer.writeByte(BE_LIST);
 				for (BValue item : node) {
 					encode(item);
 				}
-				buffer.put(BE_END);
+				buffer.writeByte(BE_END);
 				break;
 			case DICT:
-				buffer.put(BE_DICT);
+				buffer.writeByte(BE_DICT);
 				for (BValue key : node) {
 					encode(key);
 					encode(key.getChild());
 				}
-				buffer.put(BE_END);
+				buffer.writeByte(BE_END);
 				break;
 			case STRING:
 				byte[] bytes = ((BString)node).get();
-				buffer.put(encodeInt(bytes.length));
-				buffer.put(BE_STRING_SEP);
-				buffer.put(bytes);
+				buffer.writeBytes(encodeInt(bytes.length));
+				buffer.writeByte(BE_STRING_SEP);
+				buffer.writeBytes(bytes);
 				break;
 			}
 		}
 		
 		public byte[] get() {
-			int length = buffer.position();
+			int length = buffer.writerIndex();
 			byte[] out = new byte[length];
 			
-			buffer.get(out, 0, length);
+			buffer.getBytes(0, out);
 			return out;
 		}
 	}
