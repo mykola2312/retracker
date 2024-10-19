@@ -12,3 +12,8 @@ on successful peer list retrieval - local tracker cache updated. If not, peers f
 On re-announce to destination trackers, proxied peer's real IP must be injected into announce request and
 other parameters should remain same as in original request.
 
+
+
+
+Maven exec with args:
+	mvn exec:java -Dexec.args=''
