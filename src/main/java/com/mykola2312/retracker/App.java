@@ -1,6 +1,7 @@
 package com.mykola2312.retracker;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.commons.cli.CommandLine;
@@ -10,6 +11,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mykola2312.retracker.config.Config;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -21,15 +24,32 @@ public class App {
 	private static final Logger log = LoggerFactory.getLogger(App.class);
 	
 	public static void main(String[] args) {
+		final Option logDirOpt = new Option("l", "log", true, "log dir path");
+		final Option configFileOpt = new Option("c", "config", true, "config.json path");
 		final Options options = new Options()
-				.addOption("l", "log", true, "log dir path");
-		final Option logDirOpt = options.getOption("log");
+				.addOption(configFileOpt)
+				.addOption(logDirOpt);
 		
 		CommandLine cli = null;
 		try {
 			cli = new DefaultParser().parse(options, args);
 		} catch (ParseException e) {
 			System.err.printf("Argument error: %s\n", e.toString());
+			System.exit(1);
+		}
+		
+		String configFilePath = cli.getOptionValue(configFileOpt);
+		if (configFilePath == null) {
+			System.err.println("config.json path not specified. exiting");
+			System.exit(1);
+		}
+		
+		// load config
+		Config config = null;
+		try {
+			config = Config.loadConfig(configFilePath);
+		} catch (IOException e) {
+			System.err.printf("failed to read %s: %s\n", configFilePath, e.toString());
 			System.exit(1);
 		}
 		

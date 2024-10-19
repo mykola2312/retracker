@@ -15,5 +15,7 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-# Log files
+# retracker runtime files
 log/
+config.json
+retracker.pid
