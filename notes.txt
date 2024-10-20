@@ -17,5 +17,8 @@ When there is need to expose local tracker a tracker endpoint should be declare 
 is HTTP or UDP server responsing to BitTorrent announces just like if it was any other regular torrent tracker.
 
 
+Announce request coming from local peer contains local (peer) data: ID, uploaded, downloaded, and so on.
+Announce response contains peer set.
+
 Maven exec with args:
 	mvn exec:java -Dexec.args=''

@@ -24,8 +24,8 @@ public class App {
 	private static final Logger log = LoggerFactory.getLogger(App.class);
 	
 	public static void main(String[] args) {
-		final Option logDirOpt = new Option("l", "log", true, "log dir path");
 		final Option configFileOpt = new Option("c", "config", true, "config.json path");
+		final Option logDirOpt = new Option("l", "log", true, "log dir path");
 		final Options options = new Options()
 				.addOption(configFileOpt)
 				.addOption(logDirOpt);
