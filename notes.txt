@@ -20,5 +20,12 @@ is HTTP or UDP server responsing to BitTorrent announces just like if it was any
 Announce request coming from local peer contains local (peer) data: ID, uploaded, downloaded, and so on.
 Announce response contains peer set.
 
+Proposal 2 to retracker scheme:
+	Local peers will announce to tracker of retracker. Retracker job will find peer that are eligible for re-announce,
+	and announce them to destination trackers, with all local data like downloaded/uploaded, BUT IPs rewritten
+	with rules, that will be specified in config to translate proxied peer's IP.
+	Apart from re-announces, tracker will act like regulat BitTorrent tracker: serving peer lists and keeping track
+	of torrents.
+
 Maven exec with args:
 	mvn exec:java -Dexec.args=''
