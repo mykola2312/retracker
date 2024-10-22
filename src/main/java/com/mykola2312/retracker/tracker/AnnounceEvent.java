@@ -8,45 +8,40 @@ public enum AnnounceEvent {
 	
 	private int value;
 	
-	AnnounceEvent() {
-		this.value = 0;
-	}
-	
 	AnnounceEvent(int value) {
 		this.value = value;
 	}
 	
-	public static AnnounceEvent fromString(String value) {
+	public static AnnounceEvent fromEventString(String value) throws Exception {
 		switch (value) {
 		case "none":		return AnnounceEvent.NONE;
 		case "started":		return AnnounceEvent.STARTED;
 		case "stopped":		return AnnounceEvent.STOPPED;
 		case "completed":	return AnnounceEvent.COMPLETED;
-		default:			return null;
+		default:			throw new Exception("unknown event: " + value);
 		}
 	}
 	
-	public static AnnounceEvent fromInteger(int value) {
+	public static AnnounceEvent fromEventValue(int value) throws Exception {
 		switch (value) {
 		case 0:				return AnnounceEvent.NONE;
 		case 1:				return AnnounceEvent.STARTED;
 		case 2:				return AnnounceEvent.STOPPED;
 		case 3:				return AnnounceEvent.COMPLETED;
-		default:			return null;
+		default:			throw new Exception("unknown event: " + value);
 		}
 	}
 	
-	@Override
-	public String toString() {
+	public String toEventString() {
 		switch (this) {
 		case STARTED:		return "started";
 		case STOPPED:		return "stopped";
 		case COMPLETED:		return "completed";
-		default:			return null;
+		default:			throw new RuntimeException("UNEXPECTED event value in AnnounceEvent: " + value);
 		}
 	}
 	
-	public int toInteger() {
+	public int toEventValue() {
 		return this.value;
 	}
 }

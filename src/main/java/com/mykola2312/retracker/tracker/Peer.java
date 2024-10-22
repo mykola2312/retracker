@@ -5,4 +5,10 @@ import java.net.InetSocketAddress;
 public class Peer {
 	private PeerType type;
 	private InetSocketAddress address;
+	private PeerLocalData data = null;
+	
+	// remote peer
+	
+	
+	// local peer
 }
