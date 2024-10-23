@@ -27,5 +27,13 @@ Proposal 2 to retracker scheme:
 	Apart from re-announces, tracker will act like regulat BitTorrent tracker: serving peer lists and keeping track
 	of torrents.
 
+Local peers and destination tracker's peers conflict:
+	When local peer 69.69.69.69:1337 announces to local tracker (aka retracker), he is recorded into peer set of local tracker.
+	Then, if being matched by specific properties, being re-announced to destination tracker; designation of re-announce is to gather
+	peer list from destination tracker and, of course, announce about local peer (with re-written, proxied IP).
+	This creates situation, when re-announce job updates his cache, which is local tracker, and puts 69.69.69.69:1337
+	into peer list, overwriting local peer record, which is IMPORTANT because it holds local data.
+	To avoid this conflict, a Set must be used guaranteeing unique list of peers, on conflicting peers - always PREFER LOCAL record.
+
 Maven exec with args:
 	mvn exec:java -Dexec.args=''
