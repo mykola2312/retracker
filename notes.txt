@@ -35,5 +35,12 @@ Local peers and destination tracker's peers conflict:
 	into peer list, overwriting local peer record, which is IMPORTANT because it holds local data.
 	To avoid this conflict, a Set must be used guaranteeing unique list of peers, on conflicting peers - always PREFER LOCAL record.
 
+Local tracker cache and destination tracker peers:
+	On each re-announce job retracker shall add peers to its local tracker, but what to do if peer is not present in returned
+	destination tracker's announce response? If we flush all peers and override them with destination tracker peer list,
+	this would delete peers that are local announced. Therefore, a grace period should be added to each REMOTE peer, and vanish only
+	after absence in N announce responses from destination tracker.
+	If we don't flush peer list - it will indefinitely grow bigger and bigger.
+
 Maven exec with args:
 	mvn exec:java -Dexec.args=''
