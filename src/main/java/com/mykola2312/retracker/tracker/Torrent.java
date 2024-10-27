@@ -31,7 +31,7 @@ public class Torrent {
 		}
 	}
 	
-	public <T extends Collection<Peer>> void updatePeers(T src) {
+	public <T extends Collection<Peer>> void putPeers(T src) {
 		for (Peer peer : src) {
 			peers.put(peer);
 		}

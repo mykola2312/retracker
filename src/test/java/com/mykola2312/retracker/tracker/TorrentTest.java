@@ -31,7 +31,7 @@ public class TorrentTest {
 		
 		List<Peer> src = Arrays.asList(new Peer(newAddress("127.0.0.1", 1337)),
 										new Peer(newAddress("127.0.0.1", 1338)));
-		torrent.updatePeers(src);
+		torrent.putPeers(src);
 		{
 			ArrayList<Peer> copy = new ArrayList<Peer>();
 			torrent.copyPeers(copy);
