@@ -85,7 +85,11 @@ public class Main {
 		}
 		
 		Application app = new Application(config);
+		app.init();
 		
+		app.start();
 		log.info("retracker started!");
+		
+		app.mainLoop();
 	}
 }

@@ -11,4 +11,13 @@ public enum TrackerProtocol {
 		default:	return 0;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		switch (this) {
+		case HTTP:	return "http";
+		case UDP:	return "udp";
+		default:	return "<unknown>";
+		}
+	}
 }
