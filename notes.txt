@@ -42,5 +42,16 @@ Local tracker cache and destination tracker peers:
 	after absence in N announce responses from destination tracker.
 	If we don't flush peer list - it will indefinitely grow bigger and bigger.
 
+Server architecture 1:
+	Tracker class has synchronized methods for access by running threads. Also Tracker has list of running threads, that are either
+	TrackerServer or TrackerJob. Tracker is responsible for starting and stopping them.
+
+Server architecture 2:
+	There is some other entity like Application class that handles running threads, making Tracker responsible for only one thing
+	abd that thing is tracking peers of torrents. This is preferred design choice since we can then export tracking and scraping
+	functionality in separate interfaces, since UDP announce protocol has scrape method, whilst HTTP doesn't. As for now, current Tracker
+	class implementation doesn't provide any other information for Torrent besides its InfoHash and PeerSet, which is built from local announces
+	and announces to destination trackers.
+
 Maven exec with args:
 	mvn exec:java -Dexec.args=''
