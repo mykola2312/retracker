@@ -124,7 +124,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.4.1</version>
             <configuration>
-                <mainClass>com.mykola2312.retracker.App</mainClass>
+                <mainClass>com.mykola2312.retracker.Main</mainClass>
             </configuration>
         </plugin>
       </plugins>

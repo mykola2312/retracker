@@ -20,8 +20,8 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 
-public class App {
-	private static final Logger log = LoggerFactory.getLogger(App.class);
+public class Main {
+	private static final Logger log = LoggerFactory.getLogger(Main.class);
 	
 	public static void main(String[] args) {
 		final Option configFileOpt = new Option("c", "config", true, "config.json path");
@@ -83,6 +83,8 @@ public class App {
 			logbackLogger.setLevel(Level.INFO);
 			logbackLogger.setAdditive(false);
 		}
+		
+		Application app = new Application(config);
 		
 		log.info("retracker started!");
 	}

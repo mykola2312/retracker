@@ -48,7 +48,7 @@ Server architecture 1:
 
 Server architecture 2:
 	There is some other entity like Application class that handles running threads, making Tracker responsible for only one thing
-	abd that thing is tracking peers of torrents. This is preferred design choice since we can then export tracking and scraping
+	and that thing is tracking peers of torrents. This is preferred design choice since we can then export tracking and scraping
 	functionality in separate interfaces, since UDP announce protocol has scrape method, whilst HTTP doesn't. As for now, current Tracker
 	class implementation doesn't provide any other information for Torrent besides its InfoHash and PeerSet, which is built from local announces
 	and announces to destination trackers.
